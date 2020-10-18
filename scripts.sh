@@ -4,10 +4,11 @@ function usage
     echo "usage: ./scripts.sh [[-b ] | [-r]]"
     echo "-b | --build          Build ros dev docker image"
     echo "-r | --run            Run ros dev docker image"
+    echo "-p | --push           Push ros dev docker image"
     echo "-h | --help           This message"
 }
 
-IMAGE_NAME=rosdev
+IMAGE_NAME=yosoufe/rosdev
 CONTAINER_NAME=ros2
 
 build_image(){
@@ -28,10 +29,7 @@ run_image(){
         -v /etc/shadow:/etc/shadow:ro \
         -u $(id -u):$(id -g) \
         -e DISPLAY \
-        -v /tmp/.X11-unix:/tmp/.X11-unix \
-        -v /home/yousof/.config/terminator/config:/home/yousof/.config/terminator/config \
-        -v /home/yousof/.cache/dconf:/home/yousof/.cache/dconf \
-        -v /home/yousof/.config/terminator:/driveconst/.config/terminator \
+        -v ${HOME}:${HOME}\
         $IMAGE_NAME 
 }
 
@@ -42,6 +40,10 @@ exec_image(){
         bash
 }
 
+push_image(){
+    docker push $IMAGE_NAME
+}
+
 
 if [ "$#" -lt 1 ]; then
     usage
@@ -49,6 +51,7 @@ fi
 
 BUILD=false
 RUN=false
+PUSH=false
 
 # Iterate through command line inputs
 while [ "$1" != "" ]; do
@@ -59,6 +62,8 @@ while [ "$1" != "" ]; do
                                 ;;
         -br | -rb )             BUILD=true
                                 RUN=true
+                                ;;
+        -p | --push )           PUSH=true
                                 ;;
         -h | --help )           usage
                                 exit
@@ -81,6 +86,10 @@ if [ "$RUN" = true ] ; then
     else
         exec_image
     fi
+fi
+
+if [ "$PUSH" = true ] ; then
+    push_image
 fi
 
 

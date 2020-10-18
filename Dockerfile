@@ -98,28 +98,10 @@ RUN echo "yaml file:///etc/ros/rosdep/prereqs.yaml" | \
     mv temp /etc/ros/rosdep/sources.list.d/20-default.list
 RUN rosdep update
 
-# install dependencies
-# RUN . /opt/ros/$ROS_DISTRO/setup.sh \
-#     && rosdep install -y \
-#     --from-paths /opt/ros/$ROS_DISTRO/share \
-#     --ignore-src \
-#     --skip-keys "rti-connext-dds-5.3.1" \
-#     --os=ubuntu:xenial \
-#     --rosdistro=${ROS_DISTRO}
-
-# FIXME Remove this once rosdep detects ROS 2 packages https://github.com/ros-infrastructure/rosdep/issues/660
-# ignore installed rosdep keys
-ENV ROS_PACKAGE_PATH /opt/ros/$ROS_DISTRO/share
-
-# FIXME Remove this once ament_export_interfaces respects COLCON_CURRENT_PREFIX https://github.com/ament/ament_cmake/issues/173
-#Workaround hard coded paths in nightly tarball setup scripts
-ARG UPSTREAM_CI_WS=/home/jenkins-agent/workspace/packaging_linux/ws
-RUN mkdir -p $UPSTREAM_CI_WS && ln -s /opt/ros/$ROS_DISTRO $UPSTREAM_CI_WS/install
-
 # terminator
 RUN apt-get update && apt-get autoremove -y \
     && apt-get install -y \
-        python3-gi gir1.2-keybinder-3.0 gettext intltool dbus-x11\
+        python3-gi gir1.2-keybinder-3.0 gettext intltool dbus-x11 x11-apps\
         gobject-introspection \
         gir1.2-gtk-3.0 \
         libvte-2.91-dev \
